@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/navigation_home">
+
+    <fragment
+        android:id="@+id/navigation_home"
+        android:name="com.example.delivaroos.ui.home.HomeFragment"
+        android:label="Home" />
+
+    <fragment
+        android:id="@+id/navigation_search"
+        android:name="com.example.delivaroos.ui.search.SearchFragment"
+        android:label="Search" />
+
+    <fragment
+        android:id="@+id/navigation_cart"
+        android:name="com.example.delivaroos.ui.cart.CartFragment"
+        android:label="Cart" />
+
+    <fragment
+        android:id="@+id/navigation_profile"
+        android:name="com.example.delivaroos.ui.profile.ProfileFragment"
+        android:label="Profile" />
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.delivaroos.ui.auth.LoginFragment"
+        android:label="Login" />
+
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="com.example.delivaroos.ui.auth.RegisterFragment"
+        android:label="Register" />
+</navigation> 
