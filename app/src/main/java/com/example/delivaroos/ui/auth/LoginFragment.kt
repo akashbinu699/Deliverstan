@@ -25,23 +25,47 @@ class LoginFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupClickListeners()
+    }
 
+    private fun setupClickListeners() {
         binding.buttonLogin.setOnClickListener {
-            // Simple validation
             val email = binding.editTextEmail.text.toString()
             val password = binding.editTextPassword.text.toString()
 
-            if (email.isNotEmpty() && password.isNotEmpty()) {
-                // Navigate to home screen
-                findNavController().navigate(R.id.action_loginFragment_to_navigation_home)
-            } else {
-                Toast.makeText(context, "Please fill all fields", Toast.LENGTH_SHORT).show()
+            if (validateInputs(email, password)) {
+                // Simple validation for demo purposes
+                if (email == "test@test.com" && password == "password") {
+                    navigateToHome()
+                } else {
+                    showError("Invalid credentials")
+                }
             }
         }
 
         binding.buttonRegister.setOnClickListener {
             findNavController().navigate(R.id.action_loginFragment_to_registerFragment)
         }
+    }
+
+    private fun validateInputs(email: String, password: String): Boolean {
+        if (email.isEmpty()) {
+            showError("Please enter email")
+            return false
+        }
+        if (password.isEmpty()) {
+            showError("Please enter password")
+            return false
+        }
+        return true
+    }
+
+    private fun navigateToHome() {
+        findNavController().navigate(R.id.action_loginFragment_to_navigation_home)
+    }
+
+    private fun showError(message: String) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 
     override fun onDestroyView() {

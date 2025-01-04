@@ -35,7 +35,7 @@ class CartAdapter(
         fun bind(item: CartItem) {
             binding.apply {
                 textTitle.text = item.foodItem.title
-                textPrice.text = String.format("$%.2f", item.totalPrice)
+                textPrice.text = String.format("£%.2f", item.totalPrice)
                 textQuantity.text = item.quantity.toString()
 
                 Glide.with(root)

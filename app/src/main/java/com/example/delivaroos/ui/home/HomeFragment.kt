@@ -6,20 +6,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.delivaroos.databinding.FragmentHomeBinding
-import com.example.delivaroos.models.CartItem
-import com.example.delivaroos.models.FoodItem
 import com.example.delivaroos.viewmodels.CartViewModel
 import com.example.delivaroos.viewmodels.FoodViewModel
 
 class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
-    private val foodViewModel: FoodViewModel by viewModels()
+    private val foodViewModel: FoodViewModel by activityViewModels()
     private val cartViewModel: CartViewModel by activityViewModels()
     private lateinit var foodAdapter: FoodAdapter
 
@@ -34,56 +31,51 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        
+
         setupRecyclerView()
         setupObservers()
         setupSwipeRefresh()
-        
-        loadFoodItems()
+
+        if (foodViewModel.foodItems.value.isNullOrEmpty()) {
+            foodViewModel.searchFoodItems()
+        }
     }
 
     private fun setupRecyclerView() {
-        foodAdapter = FoodAdapter { foodItem ->
-            cartViewModel.addToCart(CartItem(foodItem))
-            Toast.makeText(context, "Added to cart", Toast.LENGTH_SHORT).show()
-        }
-        
+        foodAdapter = FoodAdapter(
+            onAddToCart = { foodItem ->
+                cartViewModel.addToCart(foodItem)
+                Toast.makeText(context, "Added to cart", Toast.LENGTH_SHORT).show()
+            }
+        )
+
         binding.recyclerViewFood.apply {
-            layoutManager = GridLayoutManager(context, 2)
+            layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
             adapter = foodAdapter
-            setHasFixedSize(true)
         }
     }
 
     private fun setupObservers() {
         foodViewModel.foodItems.observe(viewLifecycleOwner) { items ->
             foodAdapter.submitList(items)
-            binding.progressBar.visibility = View.GONE
-            binding.textEmpty.visibility = if (items.isEmpty()) View.VISIBLE else View.GONE
-        }
-
-        foodViewModel.error.observe(viewLifecycleOwner) { error ->
-            Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
-            binding.progressBar.visibility = View.GONE
-            binding.textEmpty.visibility = View.VISIBLE
-            binding.textEmpty.text = "Error loading food items"
+            binding.emptyState.visibility = if (items.isEmpty()) View.VISIBLE else View.GONE
         }
 
         foodViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
             binding.swipeRefresh.isRefreshing = isLoading
+        }
+
+        foodViewModel.error.observe(viewLifecycleOwner) { error ->
+            if (error.isNotEmpty()) {
+                Toast.makeText(context, error, Toast.LENGTH_LONG).show()
+            }
         }
     }
 
     private fun setupSwipeRefresh() {
         binding.swipeRefresh.setOnRefreshListener {
-            loadFoodItems()
+            foodViewModel.searchFoodItems()
         }
-    }
-
-    private fun loadFoodItems() {
-        binding.progressBar.visibility = View.VISIBLE
-        foodViewModel.searchFoodItems("burger,pizza,pasta,sushi,salad")
     }
 
     override fun onDestroyView() {

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "202899508524",
+    "project_id": "deliverstan-cd2ef",
+    "storage_bucket": "deliverstan-cd2ef.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:202899508524:android:d91bb9416807768220b089",
+        "android_client_info": {
+          "package_name": "com.example.delivaroos"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCa-CV5PKFivEP3oXyfLTJYKzp3CDVrTVc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

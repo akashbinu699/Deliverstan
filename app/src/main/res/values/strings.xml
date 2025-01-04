@@ -9,4 +9,8 @@
     <string name="email_hint">Email</string>
     <string name="password_hint">Password</string>
     <string name="create_account">Create Account</string>
+    <string name="order_success">Order Placed Successfully!</string>
+    <string name="order_number">Order #%s</string>
+    <string name="order_details">Your order has been placed and will be delivered soon.\nYou can track your order in the Orders section.</string>
+    <string name="back_to_home">Back to Home</string>
 </resources>

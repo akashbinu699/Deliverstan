@@ -36,7 +36,7 @@ class FoodAdapter(
             binding.apply {
                 textTitle.text = foodItem.title
                 textRestaurant.text = foodItem.restaurantChain
-                textPrice.text = String.format("$%.2f", foodItem.price)
+                textPrice.text = String.format("£%.2f", foodItem.price)
 
                 Glide.with(root)
                     .load(foodItem.image)

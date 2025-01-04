@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/loginFragment">
+    app:startDestination="@id/loginFragment">
 
     <fragment
         android:id="@+id/loginFragment"
@@ -15,9 +15,7 @@
             app:destination="@id/registerFragment" />
         <action
             android:id="@+id/action_loginFragment_to_navigation_home"
-            app:destination="@id/navigation_home"
-            app:popUpTo="@id/loginFragment"
-            app:popUpToInclusive="true" />
+            app:destination="@id/navigation_home" />
     </fragment>
 
     <fragment
@@ -39,21 +37,59 @@
         tools:layout="@layout/fragment_home" />
 
     <fragment
-        android:id="@+id/navigation_search"
-        android:name="com.example.delivaroos.ui.search.SearchFragment"
-        android:label="Search"
-        tools:layout="@layout/fragment_search" />
-
-    <fragment
         android:id="@+id/navigation_cart"
         android:name="com.example.delivaroos.ui.cart.CartFragment"
         android:label="Cart"
-        tools:layout="@layout/fragment_cart" />
+        tools:layout="@layout/fragment_cart">
+        <action
+            android:id="@+id/action_navigation_cart_to_orderConfirmationFragment"
+            app:destination="@id/orderConfirmationFragment"
+            app:popUpTo="@id/navigation_cart"
+            app:popUpToInclusive="true" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_profile"
         android:name="com.example.delivaroos.ui.profile.ProfileFragment"
         android:label="Profile"
-        tools:layout="@layout/fragment_profile" />
+        tools:layout="@layout/fragment_profile">
+        <action
+            android:id="@+id/action_navigation_profile_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/navigation_home"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/orderConfirmationFragment"
+        android:name="com.example.delivaroos.ui.order.OrderConfirmationFragment"
+        android:label="Order Confirmation"
+        tools:layout="@layout/fragment_order_confirmation">
+        <action
+            android:id="@+id/action_orderConfirmationFragment_to_navigation_home"
+            app:destination="@id/navigation_home"
+            app:popUpTo="@id/navigation_home"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_orders"
+        android:name="com.example.delivaroos.ui.orders.OrdersFragment"
+        android:label="Orders"
+        tools:layout="@layout/fragment_orders">
+        <action
+            android:id="@+id/action_navigation_orders_to_orderDetails"
+            app:destination="@id/orderDetailsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/orderDetailsFragment"
+        android:name="com.example.delivaroos.ui.orders.OrderDetailsFragment"
+        android:label="Order Details"
+        tools:layout="@layout/fragment_order_details">
+        <argument
+            android:name="orderId"
+            app:argType="string" />
+    </fragment>
 
 </navigation>

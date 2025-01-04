@@ -5,5 +5,5 @@ data class FoodItem(
     val title: String,
     val image: String,
     val restaurantChain: String,
-    val price: Double = 9.99
+    val price: Double = 4.99
 ) 

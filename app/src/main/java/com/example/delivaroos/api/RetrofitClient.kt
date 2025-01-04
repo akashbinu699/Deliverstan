@@ -6,8 +6,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
-    private const val BASE_URL = "https://api.spoonacular.com/"
-    const val API_KEY = "340068c01447413bb2eb4f4e3799cd1a" // Make it accessible for the repository
+    private const val BASE_URL = "https://foodish-api.com/"
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
@@ -23,5 +22,5 @@ object RetrofitClient {
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
-    val spoonacularApi: SpoonacularApi = retrofit.create(SpoonacularApi::class.java)
+    val foodishApi: FoodishApi = retrofit.create(FoodishApi::class.java)
 } 

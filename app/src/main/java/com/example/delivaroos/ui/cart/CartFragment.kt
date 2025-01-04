@@ -7,7 +7,9 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.delivaroos.R
 import com.example.delivaroos.databinding.FragmentCartBinding
 import com.example.delivaroos.viewmodels.CartViewModel
 
@@ -59,7 +61,11 @@ class CartFragment : Fragment() {
         }
 
         viewModel.totalPrice.observe(viewLifecycleOwner) { total ->
-            binding.textTotalPrice.text = String.format("$%.2f", total)
+            binding.textTotalPrice.text = String.format("£%.2f", total)
+        }
+
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
         }
     }
 
@@ -67,7 +73,7 @@ class CartFragment : Fragment() {
         binding.buttonCheckout.setOnClickListener {
             if (viewModel.cartItems.value?.isNotEmpty() == true) {
                 viewModel.clearCart()
-                Toast.makeText(context, "Order placed successfully!", Toast.LENGTH_SHORT).show()
+                findNavController().navigate(R.id.action_navigation_cart_to_orderConfirmationFragment)
             } else {
                 Toast.makeText(context, "Your cart is empty", Toast.LENGTH_SHORT).show()
             }
