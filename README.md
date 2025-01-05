@@ -36,6 +36,6 @@ The application follows a structured MVVM (Model-View-ViewModel) architecture wi
 
 The application is developed using Android Studio. To setup this project locally, you need to:
 
-1. Clone the repository: `git clone https://github.com/kayaalpkoker/kotlin-food-delivery-app.git`
+1. Clone the repository: `git clone https://github.com/akashbinu699/Deliverstan.git`
 2. Open the project in Android Studio.
 3. Sync the Gradle files and run the build.
