@@ -29,44 +29,54 @@ class RegisterFragment : Fragment() {
         binding.buttonRegister.setOnClickListener {
             val name = binding.editTextName.text.toString()
             val email = binding.editTextEmail.text.toString()
+            val floor = binding.editTextFloor.text.toString()
+            val seatNo = binding.editTextSeatNo.text.toString()
             val password = binding.editTextPassword.text.toString()
-            val confirmPassword = binding.editTextConfirmPassword.text.toString()
 
-            if (validateInputs(name, email, password, confirmPassword)) {
+            if (validateInputs(name, email, floor, seatNo, password)) {
                 findNavController().navigate(R.id.action_registerFragment_to_navigation_home)
             }
-        }
-
-        binding.buttonBack.setOnClickListener {
-            findNavController().navigateUp()
         }
     }
 
     private fun validateInputs(
         name: String,
         email: String,
-        password: String,
-        confirmPassword: String
+        floor: String,
+        seatNo: String,
+        password: String
     ): Boolean {
-        when {
-            name.isEmpty() -> {
-                showError("Please enter your name")
-                return false
-            }
-            email.isEmpty() -> {
-                showError("Please enter your email")
-                return false
-            }
-            password.isEmpty() -> {
-                showError("Please enter a password")
-                return false
-            }
-            password != confirmPassword -> {
-                showError("Passwords do not match")
-                return false
-            }
+        var isValid = true
+
+        if (name.isBlank()) {
+            binding.editTextName.error = "Name is required"
+            isValid = false
         }
-        return true
+
+        if (email.isBlank()) {
+            binding.editTextEmail.error = "Email is required"
+            isValid = false
+        } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            binding.editTextEmail.error = "Invalid email format"
+            isValid = false
+        }
+
+        if (floor.isBlank()) {
+            binding.editTextFloor.error = "Floor is required"
+            isValid = false
+        }
+
+        if (seatNo.isBlank()) {
+            binding.editTextSeatNo.error = "Seat number is required"
+            isValid = false
+        }
+
+        if (password.length < 6) {
+            binding.editTextPassword.error = "Password must be at least 6 characters"
+            isValid = false
+        }
+
+        return isValid
     }
 
     private fun showError(message: String) {

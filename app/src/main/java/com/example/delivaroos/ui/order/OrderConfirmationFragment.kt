@@ -1,6 +1,7 @@
 package com.example.delivaroos.ui.order
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +21,7 @@ class OrderConfirmationFragment : Fragment() {
     private val binding get() = _binding!!
     private val orderViewModel: OrderViewModel by activityViewModels()
     private val cartViewModel: CartViewModel by activityViewModels()
+    private var orderCreated = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -32,28 +34,36 @@ class OrderConfirmationFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        createOrder()
+        setupBackButton()
+    }
 
-        // Create new order from cart items
+    private fun createOrder() {
+        if (orderCreated) return
+
         cartViewModel.cartItems.value?.let { items ->
             if (items.isNotEmpty()) {
                 val orderId = UUID.randomUUID().toString()
                 val order = Order(
                     id = orderId,
-                    items = items.toList(), // Create a new list to avoid reference issues
+                    items = items.toList(),
                     totalAmount = cartViewModel.totalPrice.value ?: 0.0,
                     status = OrderStatus.PENDING,
                     timestamp = System.currentTimeMillis()
                 )
-                
+
                 // Add order and show confirmation
                 orderViewModel.addOrder(order)
-                binding.textOrderNumber.text = getString(R.string.order_number, orderId.takeLast(6))
+                Log.d("OrderConfirmation", "Created order: $orderId with ${items.size} items")
                 
-                // Clear cart after successful order creation
+                binding.textOrderNumber.text = getString(R.string.order_number, orderId.takeLast(6))
                 cartViewModel.clearCart()
+                orderCreated = true
             }
         }
+    }
 
+    private fun setupBackButton() {
         binding.buttonBackToHome.setOnClickListener {
             findNavController().navigate(
                 R.id.action_orderConfirmationFragment_to_navigation_home,

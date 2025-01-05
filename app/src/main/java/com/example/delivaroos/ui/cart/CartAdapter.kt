@@ -6,12 +6,12 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.delivaroos.R
 import com.example.delivaroos.databinding.ItemCartBinding
 import com.example.delivaroos.models.CartItem
 
 class CartAdapter(
-    private val onQuantityChanged: (CartItem, Int) -> Unit,
-    private val onItemRemoved: (CartItem) -> Unit
+    private val onQuantityChange: (CartItem, Int) -> Unit
 ) : ListAdapter<CartItem, CartAdapter.CartViewHolder>(CartDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CartViewHolder {
@@ -37,23 +37,22 @@ class CartAdapter(
                 textTitle.text = item.foodItem.title
                 textPrice.text = String.format("£%.2f", item.totalPrice)
                 textQuantity.text = item.quantity.toString()
+                textRestaurant.text = item.foodItem.restaurantChain
 
                 Glide.with(root)
                     .load(item.foodItem.image)
+                    .placeholder(R.drawable.placeholder_food)
+                    .error(R.drawable.placeholder_food)
                     .into(imageFood)
 
                 buttonMinus.setOnClickListener {
-                    if (item.quantity > 1) {
-                        onQuantityChanged(item, item.quantity - 1)
+                    if (item.quantity > 0) {
+                        onQuantityChange(item, item.quantity - 1)
                     }
                 }
 
                 buttonPlus.setOnClickListener {
-                    onQuantityChanged(item, item.quantity + 1)
-                }
-
-                buttonRemove.setOnClickListener {
-                    onItemRemoved(item)
+                    onQuantityChange(item, item.quantity + 1)
                 }
             }
         }

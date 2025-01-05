@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -16,7 +15,7 @@ import com.example.delivaroos.viewmodels.CartViewModel
 class CartFragment : Fragment() {
     private var _binding: FragmentCartBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: CartViewModel by activityViewModels()
+    private val cartViewModel: CartViewModel by activityViewModels()
     private lateinit var cartAdapter: CartAdapter
 
     override fun onCreateView(
@@ -30,7 +29,6 @@ class CartFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        
         setupRecyclerView()
         setupObservers()
         setupCheckoutButton()
@@ -38,15 +36,14 @@ class CartFragment : Fragment() {
 
     private fun setupRecyclerView() {
         cartAdapter = CartAdapter(
-            onQuantityChanged = { cartItem, quantity ->
-                viewModel.updateQuantity(cartItem, quantity)
-            },
-            onItemRemoved = { cartItem ->
-                viewModel.removeFromCart(cartItem)
-                Toast.makeText(context, "Item removed from cart", Toast.LENGTH_SHORT).show()
+            onQuantityChange = { item, newQuantity ->
+                if (newQuantity == 0) {
+                    cartViewModel.removeFromCart(item)
+                } else {
+                    cartViewModel.updateQuantity(item, newQuantity)
+                }
             }
         )
-        
         binding.recyclerViewCart.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = cartAdapter
@@ -54,29 +51,29 @@ class CartFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        viewModel.cartItems.observe(viewLifecycleOwner) { items ->
+        cartViewModel.cartItems.observe(viewLifecycleOwner) { items ->
             cartAdapter.submitList(items)
-            binding.emptyStateGroup.visibility = if (items.isEmpty()) View.VISIBLE else View.GONE
-            binding.cartContentGroup.visibility = if (items.isNotEmpty()) View.VISIBLE else View.GONE
+            updateVisibility(items.isEmpty())
         }
 
-        viewModel.totalPrice.observe(viewLifecycleOwner) { total ->
-            binding.textTotalPrice.text = String.format("£%.2f", total)
-        }
-
-        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+        cartViewModel.totalPrice.observe(viewLifecycleOwner) { total ->
+            binding.textTotalAmount.text = String.format("£%.2f", total)
+            binding.buttonCheckout.isEnabled = total > 0
         }
     }
 
     private fun setupCheckoutButton() {
         binding.buttonCheckout.setOnClickListener {
-            if (viewModel.cartItems.value?.isNotEmpty() == true) {
-                viewModel.clearCart()
+            if (cartViewModel.cartItems.value?.isNotEmpty() == true) {
                 findNavController().navigate(R.id.action_navigation_cart_to_orderConfirmationFragment)
-            } else {
-                Toast.makeText(context, "Your cart is empty", Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    private fun updateVisibility(isEmpty: Boolean) {
+        binding.apply {
+            emptyState.visibility = if (isEmpty) View.VISIBLE else View.GONE
+            cartContent.visibility = if (isEmpty) View.GONE else View.VISIBLE
         }
     }
 

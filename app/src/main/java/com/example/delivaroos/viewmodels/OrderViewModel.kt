@@ -19,7 +19,9 @@ class OrderViewModel : ViewModel() {
         val currentOrders = _orders.value?.toMutableList() ?: mutableListOf()
         currentOrders.add(0, order)
         _orders.value = currentOrders
-        Log.d("OrderViewModel", "Added new order: ${order.id}, Total orders: ${currentOrders.size}")
+        Log.d("OrderViewModel", "Added new order: ${order.id}")
+        Log.d("OrderViewModel", "Current orders: ${currentOrders.size}")
+        Log.d("OrderViewModel", "Order details: ${order.items.size} items, £${order.totalAmount}")
     }
 
     fun getOrderById(orderId: String): Order? {

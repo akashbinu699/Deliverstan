@@ -13,4 +13,5 @@
     <string name="order_number">Order #%s</string>
     <string name="order_details">Your order has been placed and will be delivered soon.\nYou can track your order in the Orders section.</string>
     <string name="back_to_home">Back to Home</string>
+    <string name="profile_picture">Profile Picture</string>
 </resources>

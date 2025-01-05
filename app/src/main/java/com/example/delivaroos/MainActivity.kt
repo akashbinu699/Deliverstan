@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
 
-        // Hide bottom navigation on auth screens
+        // Hide bottom navigation on certain screens
         navController.addOnDestinationChangedListener { _, destination, _ ->
             binding.navView.visibility = when (destination.id) {
                 R.id.loginFragment,

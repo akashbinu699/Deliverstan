@@ -1,10 +1,14 @@
 package com.example.delivaroos.ui.profile
 
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.delivaroos.R
@@ -13,6 +17,14 @@ import com.example.delivaroos.databinding.FragmentProfileBinding
 class ProfileFragment : Fragment() {
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
+    private var profileImageUri: Uri? = null
+
+    private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let {
+            profileImageUri = it
+            binding.imageProfile.setImageURI(it)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -27,6 +39,10 @@ class ProfileFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupClickListeners()
         setupUserInfo()
+
+        binding.buttonChangeProfilePicture.setOnClickListener {
+            pickImageLauncher.launch("image/*")
+        }
     }
 
     private fun setupUserInfo() {

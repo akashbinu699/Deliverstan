@@ -61,18 +61,6 @@
     </fragment>
 
     <fragment
-        android:id="@+id/orderConfirmationFragment"
-        android:name="com.example.delivaroos.ui.order.OrderConfirmationFragment"
-        android:label="Order Confirmation"
-        tools:layout="@layout/fragment_order_confirmation">
-        <action
-            android:id="@+id/action_orderConfirmationFragment_to_navigation_home"
-            app:destination="@id/navigation_home"
-            app:popUpTo="@id/navigation_home"
-            app:popUpToInclusive="true" />
-    </fragment>
-
-    <fragment
         android:id="@+id/navigation_orders"
         android:name="com.example.delivaroos.ui.orders.OrdersFragment"
         android:label="Orders"
@@ -90,6 +78,18 @@
         <argument
             android:name="orderId"
             app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/orderConfirmationFragment"
+        android:name="com.example.delivaroos.ui.order.OrderConfirmationFragment"
+        android:label="Order Confirmation"
+        tools:layout="@layout/fragment_order_confirmation">
+        <action
+            android:id="@+id/action_orderConfirmationFragment_to_navigation_home"
+            app:destination="@id/navigation_home"
+            app:popUpTo="@id/navigation_home"
+            app:popUpToInclusive="true" />
     </fragment>
 
 </navigation>

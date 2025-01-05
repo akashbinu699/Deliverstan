@@ -1,6 +1,7 @@
 package com.example.delivaroos.ui.orders
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -49,6 +50,7 @@ class OrdersFragment : Fragment() {
 
     private fun setupObservers() {
         orderViewModel.orders.observe(viewLifecycleOwner) { orders ->
+            Log.d("OrdersFragment", "Received ${orders.size} orders")
             orderAdapter.submitList(orders)
             updateVisibility(orders.isEmpty())
         }

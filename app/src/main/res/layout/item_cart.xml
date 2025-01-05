@@ -1,83 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginVertical="4dp"
+    android:layout_marginBottom="8dp"
+    app:cardCornerRadius="8dp"
     app:cardElevation="2dp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="8dp">
+        android:orientation="horizontal"
+        android:padding="12dp">
 
         <ImageView
             android:id="@+id/imageFood"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:scaleType="centerCrop"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:scaleType="centerCrop" />
 
-        <TextView
-            android:id="@+id/textTitle"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toStartOf="@id/buttonRemove"
-            app:layout_constraintStart_toEndOf="@id/imageFood"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                tools:text="Food Item Name" />
+
+            <TextView
+                android:id="@+id/textRestaurant"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textColor="?android:textColorSecondary"
+                tools:text="Restaurant Name" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/buttonMinus"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_minus" />
+
+                <TextView
+                    android:id="@+id/textQuantity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    tools:text="1" />
+
+                <ImageButton
+                    android:id="@+id/buttonPlus"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_plus" />
+            </LinearLayout>
+
+        </LinearLayout>
 
         <TextView
             android:id="@+id/textPrice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@id/imageFood"
-            app:layout_constraintStart_toEndOf="@id/imageFood" />
-
-        <ImageButton
-            android:id="@+id/buttonMinus"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_minus"
-            app:layout_constraintBottom_toBottomOf="@id/imageFood"
-            app:layout_constraintEnd_toStartOf="@id/textQuantity" />
-
-        <TextView
-            android:id="@+id/textQuantity"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="8dp"
+            android:layout_marginStart="12dp"
+            android:textColor="@color/design_default_color_primary"
             android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="@id/buttonMinus"
-            app:layout_constraintEnd_toStartOf="@id/buttonPlus"
-            app:layout_constraintTop_toTopOf="@id/buttonMinus" />
+            android:textStyle="bold"
+            tools:text="£9.98" />
 
-        <ImageButton
-            android:id="@+id/buttonPlus"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_plus"
-            app:layout_constraintBottom_toBottomOf="@id/buttonMinus"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/buttonMinus" />
-
-        <ImageButton
-            android:id="@+id/buttonRemove"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_remove"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView> 
