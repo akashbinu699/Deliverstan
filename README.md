@@ -1,4 +1,4 @@
-# Food Delivery App
+# Deliverstan
 
 This project represents an increment of a Food Delivery application written in Kotlin for Android.
 
