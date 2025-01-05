@@ -8,7 +8,7 @@ This project represents an increment of a Food Delivery application written in K
 - Add meals to the cart
 - View cart and checkout
 
-<img src="https://github.com/kayaalpkoker/kotlin-food-delivery-app/blob/main/demo.gif" width="300">
+<img src="https://github.com/akashbinu699/Deliverstan/blob/master/WhatsAppVideo2025-01-05at6.58.26PM-ezgif.com-video-to-gif-converter.gif" width="300">
 
 ## Libraries and Technologies Used
 
