@@ -19,4 +19,10 @@
         <item name="cardCornerRadius">8dp</item>
         <item name="android:layout_margin">4dp</item>
     </style>
+    <style name="Theme.Delivaroos.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/white</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/logo</item>
+        <item name="windowSplashScreenAnimationDuration">1000</item>
+        <item name="postSplashScreenTheme">@style/Theme.Delivaroos.NoActionBar</item>
+    </style>
 </resources>
