@@ -1,18 +1,24 @@
 package com.example.delivaroos.models
 
+import java.util.*
+
 data class Order(
     val id: String,
+    val userId: String,
     val items: List<CartItem>,
-    val totalAmount: Double,
     val status: OrderStatus,
-    val timestamp: Long = System.currentTimeMillis()
+    val orderDate: Date,
+    val deliveryAddress: String,
+    val subtotal: Double,
+    val deliveryFee: Double,
+    val total: Double,
+    val deliveredAt: Date? = null
 )
 
 enum class OrderStatus {
     PENDING,
-    CONFIRMED,
     PREPARING,
-    READY,
+    DELIVERING,
     DELIVERED,
     CANCELLED
 } 

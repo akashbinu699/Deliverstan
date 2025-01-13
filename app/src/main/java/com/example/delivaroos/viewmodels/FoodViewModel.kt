@@ -1,141 +1,92 @@
 package com.example.delivaroos.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.delivaroos.api.RetrofitClient
-import com.example.delivaroos.models.FoodItem
+import com.example.delivaroos.data.api.FoodishApi
+import com.example.delivaroos.models.Food
 import kotlinx.coroutines.launch
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import kotlin.random.Random
 
-class FoodViewModel : ViewModel() {
-    private val _foodItems = MutableLiveData<List<FoodItem>>()
-    val foodItems: LiveData<List<FoodItem>> = _foodItems
+open class FoodViewModel : ViewModel() {
+    protected val _foodItems = MutableLiveData<List<Food>>(emptyList())
+    val foodItems: LiveData<List<Food>> = _foodItems
 
-    private val _isLoading = MutableLiveData<Boolean>()
+    protected val _isLoading = MutableLiveData(false)
     val isLoading: LiveData<Boolean> = _isLoading
 
-    private val _error = MutableLiveData<String>()
-    val error: LiveData<String> = _error
+    protected val _error = MutableLiveData<String?>(null)
+    val error: LiveData<String?> = _error
+
+    private val api = Retrofit.Builder()
+        .baseUrl(FoodishApi.BASE_URL)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+        .create(FoodishApi::class.java)
 
     private val foodCategories = mapOf(
-        "biryani" to listOf(
-            "Chicken Biryani",
-            "Mutton Biryani",
-            "Vegetable Biryani",
-            "Hyderabadi Biryani",
-            "Special Biryani"
-        ),
-        "burger" to listOf(
-            "Classic Cheeseburger",
-            "Chicken Burger",
-            "BBQ Bacon Burger",
-            "Veggie Burger",
-            "Double Beef Burger"
-        ),
-        "butter-chicken" to listOf(
-            "Butter Chicken",
-            "Creamy Butter Chicken",
-            "Spicy Butter Chicken",
-            "Traditional Butter Chicken",
-            "Royal Butter Chicken"
-        ),
-        "dessert" to listOf(
-            "Chocolate Cake",
-            "Ice Cream Sundae",
-            "Cheesecake",
-            "Apple Pie",
-            "Tiramisu"
-        ),
-        "dosa" to listOf(
-            "Masala Dosa",
-            "Plain Dosa",
-            "Cheese Dosa",
-            "Onion Dosa",
-            "Mysore Masala Dosa"
-        ),
-        "idly" to listOf(
-            "Plain Idli",
-            "Rava Idli",
-            "Mini Idli Sambar",
-            "Masala Idli",
-            "Idli Platter"
-        ),
-        "pasta" to listOf(
-            "Spaghetti Carbonara",
-            "Penne Arrabbiata",
-            "Fettuccine Alfredo",
-            "Pasta Bolognese",
-            "Creamy Mushroom Pasta"
-        ),
-        "pizza" to listOf(
-            "Margherita Pizza",
-            "Pepperoni Pizza",
-            "BBQ Chicken Pizza",
-            "Vegetarian Supreme",
-            "Four Cheese Pizza"
-        ),
-        "rice" to listOf(
-            "Fried Rice",
-            "Steamed Rice",
-            "Jeera Rice",
-            "Coconut Rice",
-            "Vegetable Pulao"
-        ),
-        "samosa" to listOf(
-            "Vegetable Samosa",
-            "Keema Samosa",
-            "Cheese Samosa",
-            "Punjabi Samosa",
-            "Mini Samosa Platter"
-        )
+        "biryani" to listOf("Chicken Biryani", "Mutton Biryani", "Veg Biryani"),
+        "burger" to listOf("Classic Burger", "Cheese Burger", "Veggie Burger"),
+        "butter-chicken" to listOf("Butter Chicken", "Chicken Tikka Masala"),
+        "dessert" to listOf("Chocolate Cake", "Ice Cream", "Cheesecake"),
+        "dosa" to listOf("Masala Dosa", "Plain Dosa", "Onion Dosa"),
+        "pasta" to listOf("Spaghetti", "Penne Arrabiata", "Fettuccine Alfredo"),
+        "pizza" to listOf("Margherita Pizza", "Pepperoni Pizza", "Veggie Pizza"),
+        "rice" to listOf("Fried Rice", "Steamed Rice", "Jeera Rice"),
+        "samosa" to listOf("Veg Samosa", "Chicken Samosa", "Paneer Samosa")
     )
 
-    private val restaurants = listOf(
-        "Royal Kitchen",
-        "Spice Garden",
-        "Food Paradise",
-        "Tasty Bites",
-        "Foodie's Corner",
-        "The Grand Kitchen",
-        "Flavor House",
-        "Gourmet Express",
-        "Chef's Special",
-        "Urban Eats"
-    )
+    init {
+        loadFoodItems()
+    }
 
-    fun searchFoodItems() {
+    fun loadFoodItems() {
         viewModelScope.launch {
             _isLoading.value = true
+            _error.value = null
+            
             try {
-                val items = mutableListOf<FoodItem>()
-                repeat(10) {
+                val items = mutableListOf<Food>()
+                repeat(10) { index ->
                     try {
-                        val response = RetrofitClient.foodishApi.getRandomFood()
+                        Log.d("FoodViewModel", "Fetching random food")
+                        val response = api.getRandomFood()
                         if (response.isSuccessful) {
-                            val imageUrl = response.body()?.image ?: ""
-                            // Extract category from image URL
-                            val category = imageUrl.substringAfter("/images/").substringBefore("/")
-                            val names = foodCategories[category] ?: foodCategories["burger"]!!
+                            val imageUrl = response.body()?.image
+                            Log.d("FoodViewModel", "Response received: $imageUrl")
                             
-                            items.add(
-                                FoodItem(
-                                    id = it,
-                                    title = names.random(),
-                                    image = imageUrl,
-                                    restaurantChain = restaurants.random(),
-                                    price = (2.99 + (Random.nextDouble() * 2)).coerceAtMost(4.99)
+                            if (imageUrl != null) {
+                                val category = imageUrl.substringAfter("/images/").substringBefore("/")
+                                val names = foodCategories[category] ?: foodCategories["burger"]!!
+                                val name = names.random()
+                                
+                                // Generate a random price between £2.99 and £4.98
+                                val price = (Random.nextDouble(2.99, 4.98) * 100).toInt() / 100.0
+                                
+                                items.add(
+                                    Food(
+                                        id = "$index",
+                                        name = name,
+                                        price = price,
+                                        imageUrl = imageUrl,
+                                        category = category,
+                                        description = "Delicious $name from our $category selection"
+                                    )
                                 )
-                            )
+                            }
                         }
                     } catch (e: Exception) {
-                        // Continue with next item if one fails
+                        Log.e("FoodViewModel", "Error fetching food", e)
                     }
                 }
                 _foodItems.value = items
             } catch (e: Exception) {
-                _error.value = e.message ?: "An error occurred"
+                _error.value = "Failed to load food items"
+                Log.e("FoodViewModel", "Error loading food items", e)
             } finally {
                 _isLoading.value = false
             }

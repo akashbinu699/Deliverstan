@@ -3,63 +3,82 @@ package com.example.delivaroos.viewmodels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.delivaroos.models.CartItem
-import com.example.delivaroos.models.FoodItem
+import com.example.delivaroos.models.Food
+import kotlinx.coroutines.launch
 
-class CartViewModel : ViewModel() {
-    private val _cartItems = MutableLiveData<List<CartItem>>()
+open class CartViewModel : ViewModel() {
+    protected val _cartItems = MutableLiveData<List<CartItem>>(emptyList())
     val cartItems: LiveData<List<CartItem>> = _cartItems
 
-    private val _totalPrice = MutableLiveData<Double>()
-    val totalPrice: LiveData<Double> = _totalPrice
+    protected val _totalAmount = MutableLiveData(0.0)
+    val totalAmount: LiveData<Double> = _totalAmount
 
-    private val _isLoading = MutableLiveData<Boolean>()
-    val isLoading: LiveData<Boolean> = _isLoading
+    protected val _orderPlaced = MutableLiveData<String?>(null)
+    val orderPlaced: LiveData<String?> = _orderPlaced
 
-    init {
-        _cartItems.value = emptyList()
-        updateTotalPrice()
+    fun addToCart(food: Food) {
+        val currentItems = _cartItems.value ?: emptyList()
+        val existingItem = currentItems.find { it.food.id == food.id }
+
+        val updatedItems = if (existingItem != null) {
+            currentItems.map {
+                if (it.food.id == food.id) {
+                    it.copy(quantity = it.quantity + 1)
+                } else it
+            }
+        } else {
+            currentItems + CartItem(food = food, quantity = 1)
+        }
+
+        _cartItems.value = updatedItems
+        updateTotalAmount()
     }
 
-    fun addToCart(foodItem: FoodItem) {
-        val currentItems = _cartItems.value?.toMutableList() ?: mutableListOf()
-        val existingItem = currentItems.find { it.foodItem.id == foodItem.id }
+    fun removeFromCart(food: Food) {
+        val currentItems = _cartItems.value ?: emptyList()
+        val existingItem = currentItems.find { it.food.id == food.id }
 
         if (existingItem != null) {
-            val index = currentItems.indexOf(existingItem)
-            currentItems[index] = existingItem.copy(quantity = existingItem.quantity + 1)
-        } else {
-            currentItems.add(CartItem(foodItem, 1))
-        }
+            val updatedItems = if (existingItem.quantity > 1) {
+                currentItems.map {
+                    if (it.food.id == food.id) {
+                        it.copy(quantity = it.quantity - 1)
+                    } else it
+                }
+            } else {
+                currentItems.filter { it.food.id != food.id }
+            }
 
-        _cartItems.value = currentItems
-        updateTotalPrice()
-    }
-
-    fun updateQuantity(cartItem: CartItem, quantity: Int) {
-        val currentItems = _cartItems.value?.toMutableList() ?: return
-        val index = currentItems.indexOfFirst { it.foodItem.id == cartItem.foodItem.id }
-        if (index != -1) {
-            currentItems[index] = cartItem.copy(quantity = quantity)
-            _cartItems.value = currentItems
-            updateTotalPrice()
+            _cartItems.value = updatedItems
+            updateTotalAmount()
         }
     }
 
-    fun removeFromCart(cartItem: CartItem) {
-        val currentItems = _cartItems.value?.toMutableList() ?: return
-        currentItems.removeAll { it.foodItem.id == cartItem.foodItem.id }
-        _cartItems.value = currentItems
-        updateTotalPrice()
+    private fun updateTotalAmount() {
+        val total = _cartItems.value?.sumOf { it.food.price * it.quantity } ?: 0.0
+        _totalAmount.value = total
     }
 
-    private fun updateTotalPrice() {
-        val total = _cartItems.value?.sumOf { it.totalPrice } ?: 0.0
-        _totalPrice.value = total
+    fun placeOrder(orderViewModel: OrderViewModel) {
+        viewModelScope.launch {
+            try {
+                val currentItems = _cartItems.value ?: emptyList()
+                if (currentItems.isNotEmpty()) {
+                    orderViewModel.placeOrder(currentItems)
+                    // Clear cart after successful order
+                    _cartItems.value = emptyList()
+                    updateTotalAmount()
+                    _orderPlaced.value = "Order placed successfully!"
+                }
+            } catch (e: Exception) {
+                _orderPlaced.value = "Failed to place order: ${e.message}"
+            }
+        }
     }
 
-    fun clearCart() {
-        _cartItems.value = emptyList()
-        updateTotalPrice()
+    fun clearOrderPlaced() {
+        _orderPlaced.value = null
     }
 } 

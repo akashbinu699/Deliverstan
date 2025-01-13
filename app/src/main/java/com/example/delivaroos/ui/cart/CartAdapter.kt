@@ -2,31 +2,39 @@ package com.example.delivaroos.ui.cart
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.example.delivaroos.R
+import coil.load
+import coil.transform.CircleCropTransformation
 import com.example.delivaroos.databinding.ItemCartBinding
 import com.example.delivaroos.models.CartItem
 
 class CartAdapter(
-    private val onQuantityChange: (CartItem, Int) -> Unit
-) : ListAdapter<CartItem, CartAdapter.CartViewHolder>(CartDiffCallback()) {
+    private val onItemClick: (CartItem) -> Unit,
+    private val onIncrement: (CartItem) -> Unit,
+    private val onDecrement: (CartItem) -> Unit
+) : RecyclerView.Adapter<CartAdapter.CartViewHolder>() {
+
+    private var items = listOf<CartItem>()
+
+    fun submitList(newItems: List<CartItem>) {
+        items = newItems
+        notifyDataSetChanged()
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CartViewHolder {
-        return CartViewHolder(
-            ItemCartBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
-            )
+        val binding = ItemCartBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
         )
+        return CartViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: CartViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(items[position])
     }
+
+    override fun getItemCount() = items.size
 
     inner class CartViewHolder(
         private val binding: ItemCartBinding
@@ -34,35 +42,18 @@ class CartAdapter(
 
         fun bind(item: CartItem) {
             binding.apply {
-                textTitle.text = item.foodItem.title
-                textPrice.text = String.format("£%.2f", item.totalPrice)
-                textQuantity.text = item.quantity.toString()
-                textRestaurant.text = item.foodItem.restaurantChain
-
-                Glide.with(root)
-                    .load(item.foodItem.image)
-                    .placeholder(R.drawable.placeholder_food)
-                    .error(R.drawable.placeholder_food)
-                    .into(imageFood)
-
-                buttonMinus.setOnClickListener {
-                    if (item.quantity > 0) {
-                        onQuantityChange(item, item.quantity - 1)
-                    }
+                foodImage.load(item.food.imageUrl) {
+                    crossfade(true)
+                    transformations(CircleCropTransformation())
                 }
+                foodName.text = item.food.name
+                foodPrice.text = "£${String.format("%.2f", item.food.price)}"
+                quantity.text = item.quantity.toString()
 
-                buttonPlus.setOnClickListener {
-                    onQuantityChange(item, item.quantity + 1)
-                }
+                root.setOnClickListener { onItemClick(item) }
+                incrementButton.setOnClickListener { onIncrement(item) }
+                decrementButton.setOnClickListener { onDecrement(item) }
             }
         }
-    }
-
-    private class CartDiffCallback : DiffUtil.ItemCallback<CartItem>() {
-        override fun areItemsTheSame(oldItem: CartItem, newItem: CartItem) =
-            oldItem.foodItem.id == newItem.foodItem.id
-
-        override fun areContentsTheSame(oldItem: CartItem, newItem: CartItem) =
-            oldItem == newItem
     }
 } 

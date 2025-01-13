@@ -1,40 +1,31 @@
 package com.example.delivaroos
 
 import android.os.Bundle
-import android.view.View
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.setupWithNavController
-import com.example.delivaroos.databinding.ActivityMainBinding
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import android.view.Window
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.ui.Modifier
+import androidx.navigation.compose.rememberNavController
+import com.example.delivaroos.navigation.NavGraph
+import com.example.delivaroos.ui.theme.DelivaroosTheme
 
-class MainActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityMainBinding
-
+class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
-
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        val navHostFragment = supportFragmentManager
-            .findFragmentById(R.id.nav_host_fragment_activity_main) as NavHostFragment
-        val navController = navHostFragment.navController
-
-        val navView: BottomNavigationView = binding.navView
-        navView.setupWithNavController(navController)
-
-        // Hide bottom navigation on auth screens
-        navController.addOnDestinationChangedListener { _, destination, _ ->
-            when (destination.id) {
-                R.id.loginFragment, R.id.registerFragment -> navView.visibility = View.GONE
-                else -> navView.visibility = View.VISIBLE
+        requestWindowFeature(Window.FEATURE_NO_TITLE)
+        setContent {
+            DelivaroosTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colors.background
+                ) {
+                    val navController = rememberNavController()
+                    NavGraph(navController = navController)
+                }
             }
         }
-
-        // Keep splash screen until data is loaded
-        splashScreen.setKeepOnScreenCondition { false }
     }
 }

@@ -2,60 +2,54 @@ package com.example.delivaroos.ui.home
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.example.delivaroos.R
+import coil.load
 import com.example.delivaroos.databinding.ItemFoodBinding
-import com.example.delivaroos.models.FoodItem
+import com.example.delivaroos.models.Food
 
 class FoodAdapter(
-    private val onAddToCart: (FoodItem) -> Unit
-) : ListAdapter<FoodItem, FoodAdapter.FoodViewHolder>(FoodDiffCallback()) {
+    private val onItemClick: (Food) -> Unit,
+    private val onAddToCart: (Food) -> Unit
+) : RecyclerView.Adapter<FoodAdapter.FoodViewHolder>() {
+
+    private var items = listOf<Food>()
+
+    fun submitList(newItems: List<Food>) {
+        items = newItems
+        notifyDataSetChanged()
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FoodViewHolder {
-        return FoodViewHolder(
-            ItemFoodBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
-            )
+        val binding = ItemFoodBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
         )
+        return FoodViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: FoodViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(items[position])
     }
+
+    override fun getItemCount() = items.size
 
     inner class FoodViewHolder(
         private val binding: ItemFoodBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(foodItem: FoodItem) {
+        fun bind(food: Food) {
             binding.apply {
-                textTitle.text = foodItem.title
-                textRestaurant.text = foodItem.restaurantChain
-                textPrice.text = String.format("£%.2f", foodItem.price)
-
-                Glide.with(root)
-                    .load(foodItem.image)
-                    .placeholder(R.drawable.placeholder_food)
-                    .error(R.drawable.placeholder_food)
-                    .into(imageFood)
-
-                buttonAddToCart.setOnClickListener {
-                    onAddToCart(foodItem)
+                foodImage.load(food.imageUrl) {
+                    crossfade(true)
                 }
+                foodName.text = food.name
+                foodPrice.text = "£${String.format("%.2f", food.price)}"
+                foodDescription.text = food.description
+
+                root.setOnClickListener { onItemClick(food) }
+                addToCartButton.setOnClickListener { onAddToCart(food) }
             }
         }
-    }
-
-    private class FoodDiffCallback : DiffUtil.ItemCallback<FoodItem>() {
-        override fun areItemsTheSame(oldItem: FoodItem, newItem: FoodItem) =
-            oldItem.id == newItem.id
-
-        override fun areContentsTheSame(oldItem: FoodItem, newItem: FoodItem) =
-            oldItem == newItem
     }
 } 

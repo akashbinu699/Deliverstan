@@ -1,47 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
+    android:layout_margin="8dp"
     app:cardCornerRadius="8dp"
-    app:cardElevation="2dp">
+    app:cardElevation="4dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="12dp">
+        android:padding="8dp">
 
         <ImageView
-            android:id="@+id/imageFood"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:id="@+id/foodImage"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
             android:scaleType="centerCrop" />
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="16dp"
             android:layout_weight="1"
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/textTitle"
-                android:layout_width="match_parent"
+                android:id="@+id/foodName"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
-                android:textStyle="bold"
-                tools:text="Food Item Name" />
+                android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/textRestaurant"
-                android:layout_width="match_parent"
+                android:id="@+id/foodPrice"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:textColor="?android:textColorSecondary"
-                tools:text="Restaurant Name" />
+                android:textColor="@color/design_default_color_primary"
+                android:textSize="14sp" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -51,41 +49,27 @@
                 android:orientation="horizontal">
 
                 <ImageButton
-                    android:id="@+id/buttonMinus"
+                    android:id="@+id/decrementButton"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@drawable/ic_minus" />
+                    android:src="@drawable/ic_remove" />
 
                 <TextView
-                    android:id="@+id/textQuantity"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/quantity"
+                    android:layout_width="40dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="16dp"
+                    android:gravity="center"
                     android:textSize="16sp"
-                    android:textStyle="bold"
-                    tools:text="1" />
+                    android:textStyle="bold" />
 
                 <ImageButton
-                    android:id="@+id/buttonPlus"
+                    android:id="@+id/incrementButton"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@drawable/ic_plus" />
+                    android:src="@drawable/ic_add" />
             </LinearLayout>
-
         </LinearLayout>
-
-        <TextView
-            android:id="@+id/textPrice"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:textColor="@color/design_default_color_primary"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            tools:text="£9.98" />
-
     </LinearLayout>
-
-</com.google.android.material.card.MaterialCardView> 
+</androidx.cardview.widget.CardView> 
