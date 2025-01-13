@@ -36,8 +36,17 @@ fun ProfileScreen(
     navController: NavController,
     userViewModel: UserViewModel = viewModel()
 ) {
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let { 
+            userViewModel.updateUserPhoto(it.toString())
+        }
+    }
+
     ScreenLayout(
-        title = "Profile"
+        title = "Profile",
+        showBackButton = false
     ) { padding ->
         Column(
             modifier = Modifier
@@ -45,7 +54,103 @@ fun ProfileScreen(
                 .padding(padding)
                 .padding(horizontal = 16.dp)
         ) {
-            // Existing profile content
+            val userName by userViewModel.userName.observeAsState("")
+            val userEmail by userViewModel.userEmail.observeAsState("")
+            val userPhoto by userViewModel.userPhoto.observeAsState()
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Profile Photo
+            Box(
+                modifier = Modifier
+                    .size(120.dp)
+                    .align(Alignment.CenterHorizontally)
+                    .clickable { launcher.launch("image/*") }
+            ) {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    shape = CircleShape,
+                    color = MaterialTheme.colors.primary.copy(alpha = 0.1f)
+                ) {
+                    if (userPhoto != null) {
+                        AsyncImage(
+                            model = userPhoto,
+                            contentDescription = "Profile photo",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = "Profile",
+                            modifier = Modifier
+                                .padding(24.dp)
+                                .fillMaxSize(),
+                            tint = MaterialTheme.colors.primary
+                        )
+                    }
+                }
+                
+                Icon(
+                    imageVector = Icons.Default.PhotoCamera,
+                    contentDescription = "Change photo",
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .background(
+                            color = MaterialTheme.colors.surface,
+                            shape = CircleShape
+                        )
+                        .padding(8.dp),
+                    tint = MaterialTheme.colors.primary
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // User Info
+            Text(
+                text = userName,
+                style = MaterialTheme.typography.h5,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+            Text(
+                text = userEmail,
+                style = MaterialTheme.typography.body1,
+                color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f),
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Profile Options
+            ProfileOption(
+                icon = Icons.Default.Person,
+                text = "Edit Profile",
+                onClick = { /* Handle edit profile */ }
+            )
+            
+            ProfileOption(
+                icon = Icons.Default.LocationOn,
+                text = "Delivery Address",
+                onClick = { /* Handle address */ }
+            )
+            
+            ProfileOption(
+                icon = Icons.Default.Settings,
+                text = "Settings",
+                onClick = { /* Handle settings */ }
+            )
+            
+            ProfileOption(
+                icon = Icons.Default.ExitToApp,
+                text = "Logout",
+                onClick = { 
+                    userViewModel.logout()
+                    navController.navigate(NavScreen.Login.route) {
+                        popUpTo(NavScreen.Home.route) { inclusive = true }
+                    }
+                }
+            )
         }
     }
 }

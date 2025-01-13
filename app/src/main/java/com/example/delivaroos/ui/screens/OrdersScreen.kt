@@ -27,23 +27,25 @@ import com.example.delivaroos.ui.theme.DelivaroosTheme
 import com.example.delivaroos.ui.preview.PreviewData
 import androidx.navigation.compose.rememberNavController
 import com.example.delivaroos.ui.preview.PreviewOrderViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun OrdersScreen(
     navController: NavController,
-    orderViewModel: OrderViewModel
+    orderViewModel: OrderViewModel = viewModel()
 ) {
-    val orders by orderViewModel.orders.observeAsState(emptyList())
-    val isLoading by orderViewModel.isLoading.observeAsState(false)
-    val error by orderViewModel.error.observeAsState()
-
     ScreenLayout(
-        title = "My Orders"
-    ) { paddingValues ->
+        title = "My Orders",
+        showBackButton = false
+    ) { padding ->
+        val orders by orderViewModel.orders.observeAsState(emptyList())
+        val isLoading by orderViewModel.isLoading.observeAsState(false)
+        val error by orderViewModel.error.observeAsState()
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(padding)
         ) {
             when {
                 isLoading -> {

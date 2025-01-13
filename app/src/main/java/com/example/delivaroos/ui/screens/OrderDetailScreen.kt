@@ -4,8 +4,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -13,16 +11,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.delivaroos.models.CartItem
 import com.example.delivaroos.models.Order
 import com.example.delivaroos.models.OrderStatus
-import com.example.delivaroos.ui.components.OrderItemCard
 import com.example.delivaroos.ui.components.ScreenLayout
 import com.example.delivaroos.viewmodels.OrderViewModel
 import java.text.SimpleDateFormat
 import java.util.*
-import androidx.compose.ui.text.TextStyle
 
 @Composable
 fun OrderDetailScreen(
@@ -35,155 +31,162 @@ fun OrderDetailScreen(
         navController = navController,
         showBackButton = true
     ) { padding ->
-        Column(
+        val order by orderViewModel.getOrder(orderId).observeAsState()
+        val isLoading by orderViewModel.isLoading.observeAsState(false)
+        val error by orderViewModel.error.observeAsState()
+
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(horizontal = 16.dp)
         ) {
-            // Existing order detail content
+            when {
+                isLoading -> {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+                error != null -> {
+                    Text(
+                        text = error ?: "Error loading order",
+                        modifier = Modifier.align(Alignment.Center),
+                        color = MaterialTheme.colors.error
+                    )
+                }
+                order != null -> {
+                    OrderDetails(order = order!!)
+                }
+            }
         }
     }
 }
 
 @Composable
-private fun OrderDetail(
-    order: Order,
-    modifier: Modifier = Modifier
-) {
+private fun OrderDetails(order: Order) {
     LazyColumn(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        // Order Status
         item {
-            OrderStatusSection(order.status)
-            Spacer(modifier = Modifier.height(24.dp))
-        }
-
-        // Order Info
-        item {
-            OrderInfoSection(order)
-            Spacer(modifier = Modifier.height(24.dp))
-        }
-
-        // Order Items
-        item {
-            Text(
-                text = "Order Items",
-                style = MaterialTheme.typography.h6,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.height(8.dp))
+            OrderHeader(order)
+            Divider(modifier = Modifier.padding(vertical = 16.dp))
         }
 
         items(order.items) { item ->
-            OrderItemCard(cartItem = item)
+            OrderItemRow(item)
             Spacer(modifier = Modifier.height(8.dp))
         }
 
-        // Price Summary
         item {
-            PriceSummarySection(order)
+            Divider(modifier = Modifier.padding(vertical = 16.dp))
+            OrderSummary(order)
         }
     }
 }
 
 @Composable
-private fun OrderStatusSection(status: OrderStatus) {
+private fun OrderHeader(order: Order) {
     Column {
         Text(
-            text = "Order Status",
-            style = MaterialTheme.typography.h6,
-            fontWeight = FontWeight.Bold
+            text = "Order #${order.id.takeLast(6)}",
+            style = MaterialTheme.typography.h6
         )
         Spacer(modifier = Modifier.height(8.dp))
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            backgroundColor = when (status) {
-                OrderStatus.PENDING -> MaterialTheme.colors.primary.copy(alpha = 0.1f)
-                OrderStatus.PREPARING -> MaterialTheme.colors.secondary.copy(alpha = 0.1f)
-                OrderStatus.DELIVERING -> MaterialTheme.colors.primaryVariant.copy(alpha = 0.1f)
-                OrderStatus.DELIVERED -> MaterialTheme.colors.primary.copy(alpha = 0.1f)
-                OrderStatus.CANCELLED -> MaterialTheme.colors.error.copy(alpha = 0.1f)
-            }
-        ) {
-            Text(
-                text = status.name,
-                modifier = Modifier.padding(16.dp),
-                color = when (status) {
-                    OrderStatus.PENDING -> MaterialTheme.colors.primary
-                    OrderStatus.PREPARING -> MaterialTheme.colors.secondary
-                    OrderStatus.DELIVERING -> MaterialTheme.colors.primaryVariant
-                    OrderStatus.DELIVERED -> MaterialTheme.colors.primary
-                    OrderStatus.CANCELLED -> MaterialTheme.colors.error
-                }
-            )
-        }
-    }
-}
-
-@Composable
-private fun OrderInfoSection(order: Order) {
-    Column {
         Text(
-            text = "Order Information",
-            style = MaterialTheme.typography.h6,
-            fontWeight = FontWeight.Bold
+            text = formatDate(order.orderDate),
+            style = MaterialTheme.typography.body2,
+            color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f)
         )
         Spacer(modifier = Modifier.height(8.dp))
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            elevation = 4.dp
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                InfoRow("Order Date", formatDate(order.orderDate))
-                Spacer(modifier = Modifier.height(8.dp))
-                InfoRow("Delivery Address", order.deliveryAddress)
-                if (order.status == OrderStatus.DELIVERED) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    InfoRow("Delivered At", formatDate(order.deliveredAt!!))
-                }
-            }
-        }
+        OrderStatusChip(status = order.status)
     }
 }
 
 @Composable
-private fun PriceSummarySection(order: Order) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = 4.dp
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            InfoRow("Subtotal", "£${String.format("%.2f", order.subtotal)}")
-            Spacer(modifier = Modifier.height(8.dp))
-            InfoRow("Delivery Fee", "£${String.format("%.2f", order.deliveryFee)}")
-            Spacer(modifier = Modifier.height(8.dp))
-            Divider()
-            Spacer(modifier = Modifier.height(8.dp))
-            InfoRow(
-                "Total",
-                "£${String.format("%.2f", order.total)}",
-                MaterialTheme.typography.h6
-            )
-        }
-    }
-}
-
-@Composable
-private fun InfoRow(
-    label: String,
-    value: String,
-    textStyle: TextStyle = MaterialTheme.typography.body1
-) {
+private fun OrderItemRow(item: CartItem) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text = label, style = textStyle)
-        Text(text = value, style = textStyle, fontWeight = FontWeight.Bold)
+        Row {
+            Text(
+                text = "${item.quantity}x",
+                style = MaterialTheme.typography.body1,
+                color = MaterialTheme.colors.primary,
+                modifier = Modifier.padding(end = 8.dp)
+            )
+            Text(
+                text = item.food.name,
+                style = MaterialTheme.typography.body1
+            )
+        }
+        Text(
+            text = "£${String.format("%.2f", item.food.price * item.quantity)}",
+            style = MaterialTheme.typography.body1
+        )
+    }
+}
+
+@Composable
+private fun OrderSummary(order: Order) {
+    Column {
+        SummaryRow("Subtotal", order.subtotal)
+        SummaryRow("Delivery Fee", order.deliveryFee)
+        Spacer(modifier = Modifier.height(8.dp))
+        SummaryRow("Total", order.total, true)
+    }
+}
+
+@Composable
+private fun SummaryRow(
+    label: String,
+    amount: Double,
+    isTotal: Boolean = false
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = label,
+            style = if (isTotal) MaterialTheme.typography.h6 else MaterialTheme.typography.body1,
+            fontWeight = if (isTotal) FontWeight.Bold else FontWeight.Normal
+        )
+        Text(
+            text = "£${String.format("%.2f", amount)}",
+            style = if (isTotal) MaterialTheme.typography.h6 else MaterialTheme.typography.body1,
+            fontWeight = if (isTotal) FontWeight.Bold else FontWeight.Normal
+        )
+    }
+}
+
+@Composable
+private fun OrderStatusChip(status: OrderStatus) {
+    Surface(
+        color = when (status) {
+            OrderStatus.PENDING -> MaterialTheme.colors.primary.copy(alpha = 0.1f)
+            OrderStatus.PREPARING -> MaterialTheme.colors.secondary.copy(alpha = 0.1f)
+            OrderStatus.DELIVERING -> MaterialTheme.colors.primaryVariant.copy(alpha = 0.1f)
+            OrderStatus.DELIVERED -> MaterialTheme.colors.primary.copy(alpha = 0.1f)
+            OrderStatus.CANCELLED -> MaterialTheme.colors.error.copy(alpha = 0.1f)
+        },
+        shape = MaterialTheme.shapes.small
+    ) {
+        Text(
+            text = status.name,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+            color = when (status) {
+                OrderStatus.PENDING -> MaterialTheme.colors.primary
+                OrderStatus.PREPARING -> MaterialTheme.colors.secondary
+                OrderStatus.DELIVERING -> MaterialTheme.colors.primaryVariant
+                OrderStatus.DELIVERED -> MaterialTheme.colors.primary
+                OrderStatus.CANCELLED -> MaterialTheme.colors.error
+            },
+            style = MaterialTheme.typography.caption
+        )
     }
 }
 
